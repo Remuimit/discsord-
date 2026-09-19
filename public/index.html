@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dicsord · 局域网聊天</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========== 入口：输入昵称 + 房间 ========== -->
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <div class="gate-logo">💬</div>
+      <h1 class="gate-title">Dicsord</h1>
+      <p class="gate-sub">局域网聊天室 · 像 Discord 一样和身边人聊天</p>
+      <form id="gate-form" autocomplete="off">
+        <label class="field-label" for="gate-nick">你的昵称</label>
+        <input id="gate-nick" class="field" maxlength="20" placeholder="例如：小明" autofocus>
+
+        <label class="field-label" for="gate-room">房间</label>
+        <input id="gate-room" class="field" maxlength="30" placeholder="大厅" list="gate-rooms">
+        <datalist id="gate-rooms"></datalist>
+        <div id="gate-chips" class="gate-chips"></div>
+
+        <button type="submit" class="gate-btn">进入聊天</button>
+      </form>
+      <p id="gate-error" class="gate-error hidden"></p>
+      <p class="gate-tip">同一局域网内的设备，输入昵称进入同一房间即可开始聊天</p>
+    </div>
+  </div>
+
+  <!-- ========== 聊天主界面 ========== -->
+  <div id="app" class="app hidden">
+    <nav class="rail">
+      <div class="rail-logo" title="Dicsord">💬</div>
+    </nav>
+
+    <div id="backdrop" class="backdrop hidden"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <header class="side-head">
+        <span>房间</span>
+        <button id="btn-add-room" class="icon-btn" title="加入 / 创建房间">＋</button>
+      </header>
+      <div class="room-list" id="room-list"></div>
+      <footer class="me-panel">
+        <div class="avatar-wrap">
+          <div class="avatar sm" id="me-avatar"></div>
+          <span class="status-dot" title="在线"></span>
+        </div>
+        <div class="me-info">
+          <div class="me-nick" id="me-nick"></div>
+          <div class="me-status online" id="me-status">在线</div>
+        </div>
+      </footer>
+    </aside>
+
+    <main class="chat">
+      <header class="chat-head">
+        <button id="btn-menu" class="icon-btn mobile-only" title="房间列表">☰</button>
+        <span class="chat-room-name" id="chat-room-name"># 大厅</span>
+        <span class="head-divider"></span>
+        <span class="head-topic">局域网聊天室</span>
+        <span class="head-spacer"></span>
+        <span class="online-count" id="online-count"></span>
+        <button id="btn-members" class="icon-btn mobile-only" title="在线成员">👥</button>
+      </header>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="typing" id="typing"></div>
+
+      <footer class="composer">
+        <button id="new-msg" class="new-msg hidden" title="回到底部">↓ 新消息</button>
+        <div class="composer-box">
+          <button id="btn-img" class="icon-btn" title="发送图片（也可直接粘贴）">📎</button>
+          <button id="btn-emoji" class="icon-btn" title="表情">😊</button>
+          <textarea id="input" rows="1" maxlength="2000" placeholder="发送消息"></textarea>
+          <button id="btn-send" class="send-btn" title="发送（Enter）">➤</button>
+        </div>
+        <div id="emoji-picker" class="emoji-picker hidden"></div>
+        <input type="file" id="file-input" accept="image/*" hidden>
+      </footer>
+    </main>
+
+    <aside class="members" id="members">
+      <header class="members-head">在线 — <span id="member-count">0</span></header>
+      <div class="member-list" id="member-list"></div>
+    </aside>
+  </div>
+
+  <!-- ========== 加入房间对话框 ========== -->
+  <div id="join-dialog" class="dialog hidden">
+    <div class="dialog-card">
+      <h3>加入 / 创建房间</h3>
+      <form id="join-form" autocomplete="off">
+        <input id="join-input" class="field" maxlength="30" placeholder="输入房间名，例如：摸鱼组">
+        <button type="submit" class="gate-btn">加入房间</button>
+      </form>
+      <div class="dialog-rooms-label">或选择已有房间</div>
+      <div id="join-list" class="dialog-rooms"></div>
+      <button id="join-close" class="btn-ghost">取消</button>
+    </div>
+  </div>
+
+  <!-- ========== 图片查看器 ========== -->
+  <div id="lightbox" class="lightbox hidden">
+    <img id="lightbox-img" alt="图片预览">
+  </div>
+
+  <!-- ========== 断线提示 / 轻提示 ========== -->
+  <div id="conn-banner" class="conn-banner hidden">⚠ 连接已断开，正在尝试重新连接…</div>
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
