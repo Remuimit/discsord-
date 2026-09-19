@@ -170,6 +170,10 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({ server, maxPayload: WS_PAYLOAD_LIMIT });
 
+// ws 会把 HTTP 服务器的 error 转发到 WebSocketServer 上，必须挂一个监听，
+// 否则端口占用等错误会在这里以「未处理的 error 事件」崩溃，而不是走下面的友好提示
+wss.on('error', () => {});
+
 function leaveRoom(ws) {
   const room = ws._room;
   if (!room) return;
