@@ -31,8 +31,10 @@ function makeCollector(ws) {
     log,
     send: (obj) => ws.send(JSON.stringify(obj)),
     close: () => ws.close(),
-    waitFor(pred, timeout = 3000) {
-      const hit = log.find(pred);
+    /** 记录当前日志位置，配合 waitFor 的 from 参数只匹配之后的新消息 */
+    mark: () => log.length,
+    waitFor(pred, { timeout = 3000, from = 0 } = {}) {
+      const hit = log.slice(from).find(pred);
       if (hit) return Promise.resolve(hit);
       return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
@@ -116,7 +118,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
     // 非法图片 data URL 应被丢弃（Bob 不应收到）
     alice.send({ t: 'img', name: 'evil.png', data: 'data:text/html;base64,PHNjcmlwdD4=' });
     try {
-      await bob.waitFor(m => m.t === 'img' && m.name === 'evil.png', 800);
+      await bob.waitFor(m => m.t === 'img' && m.name === 'evil.png', { timeout: 800 });
       ok('非图片 MIME 被拒绝', false);
     } catch { ok('非图片 MIME 被拒绝', true); }
   }
@@ -136,8 +138,10 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
     ok('房间列表包含两个房间', names.includes('测试房') && names.includes('新房间'));
     ok('在线人数正确', rooms.find(r => r.name === '新房间').count === 1);
 
+    // 标记日志位置：只匹配本次重进后的 joined，避免命中首次加入的旧消息
+    const markRejoin = alice.mark();
     alice.send({ t: 'join', nick: 'Alice', room: '测试房' });
-    const rejoin = await alice.waitFor(m => m.t === 'joined' && m.room === '测试房');
+    const rejoin = await alice.waitFor(m => m.t === 'joined' && m.room === '测试房', { from: markRejoin });
     ok('重进房间能拿到历史', rejoin.history.some(h => h.t === 'chat' && h.text.includes('你好')));
   }
 
